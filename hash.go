@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Digest []byte
 
 func hash(data ...[]byte) []byte {
@@ -13,6 +11,6 @@ func hash(data ...[]byte) []byte {
 		}
 		result = result ^ sum
 	}
-	fmt.Println("Hashed: ", data, result)
+
 	return []byte{result}
 }

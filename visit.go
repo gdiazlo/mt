@@ -1,7 +1,7 @@
 package main
 
 type State struct {
-	src, dst Pos
+	cur, dst Pos
 }
 
 type Visit interface {
@@ -9,31 +9,28 @@ type Visit interface {
 	Cache(State, Digest)
 }
 
-func Traverse(t *Tree, src, dst Pos, v Visit) {
+func Traverse(t *Tree, cur, dst Pos, v Visit) {
 	var s State
 	var d Digest
 	var ok bool
 
-	s.src = src
+	s.cur = cur
 	s.dst = dst
 
-	if d, ok = t.Cached(src, dst); ok {
+	if d, ok = t.Cached(cur, dst); ok {
 		v.Cache(s, d)
 		return
 	}
 
-	switch src.Dir(dst) {
-	case Left:
-		Traverse(t, src.Left(), dst, v)
-		d = v.Exec(s)
-	case Right:
-		Traverse(t, src.Left(), dst, v)
-		Traverse(t, src.Right(), dst, v)
+	switch cur.Dir(dst) {
+	case Next:
+		Traverse(t, cur.Left(), dst, v)
+		Traverse(t, cur.Right(), dst, v)
 		d = v.Exec(s)
 	case Halt:
 		d = v.Exec(s)
 	}
 
-	t.Cache(src, dst, d)
+	t.Cache(cur, dst, d)
 
 }

@@ -23,8 +23,8 @@ func (t *Tree) Add(event []byte) (Digest, Visit) {
 	t.Lock()
 	defer t.Unlock()
 	c := NewComputeHash(event)
-	t.size += 1
-	Traverse(t, t.Root(), Pos{t.size, 0}, c)
+	t.size++
+	Traverse(t, t.Root(), t.Last(), c)
 
 	return c.path[t.Root()], c
 }
