@@ -39,7 +39,12 @@ func (t Tree) Cached(s State) (d Digest, ok bool) {
 
 func (t *Tree) Cache(s State, d Digest) {
 	// if s.dst.i >= s.cur.i+pow(2, s.cur.l)-1 {
+<<<<<<< HEAD
 	if d != nil {
 		t.cache[s.cur] = d
 	}
+=======
+	t.cache[s.cur] = d
+	// }
+>>>>>>> simplify visit interface, printer will not work probably
 }
