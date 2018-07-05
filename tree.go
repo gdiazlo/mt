@@ -22,22 +22,24 @@ func (t Tree) Last() Pos {
 func (t *Tree) Add(event []byte) (Digest, Visit) {
 	t.Lock()
 	defer t.Unlock()
-	c := NewComputeHash(event)
+	c := NewComputeVisitor(event)
 	t.size++
-	Traverse(t, t.Root(), t.Last(), c)
+
+	Traverse(t, State{t.Root(), t.Last(), t.size}, c)
 
 	return c.path[t.Root()], c
 }
 
-func (t Tree) Cached(src, dst Pos) (d Digest, ok bool) {
-	if dst.i >= src.i+pow(2, src.l)-1 {
-		d, ok = t.cache[src]
-	}
+func (t Tree) Cached(s State) (d Digest, ok bool) {
+	// if s.dst.i >= s.cur.i+pow(2, s.cur.l)-1 {
+	d, ok = t.cache[s.cur]
+	// }
 	return
 }
 
-func (t *Tree) Cache(src, dst Pos, d Digest) {
-	if dst.i >= src.i+pow(2, src.l)-1 {
-		t.cache[src] = d
+func (t *Tree) Cache(s State, d Digest) {
+	// if s.dst.i >= s.cur.i+pow(2, s.cur.l)-1 {
+	if d != nil {
+		t.cache[s.cur] = d
 	}
 }

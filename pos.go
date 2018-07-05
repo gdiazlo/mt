@@ -15,12 +15,8 @@ type Pos struct {
 	i, l uint64 // index, layer
 }
 
-func (p Pos) Dir(dst Pos) Dir {
-
-	if dst.l == 0 || p.i > dst.i {
-		return Halt
-	}
-	return Next
+func (p Pos) Next(dst Pos) bool {
+	return p.l != 0
 }
 
 func (p Pos) Left() Pos {

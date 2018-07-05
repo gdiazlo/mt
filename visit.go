@@ -2,6 +2,19 @@ package main
 
 type State struct {
 	cur, dst Pos
+	n        uint64
+}
+
+func (s State) Left() State {
+	return State{s.cur.Left(), s.dst, s.n}
+}
+
+func (s State) Right() State {
+	return State{s.cur.Right(), s.dst, s.n}
+}
+
+func (s State) Next() bool {
+	return s.cur.Next(s.dst) && s.n >= 1
 }
 
 type Visit interface {
@@ -9,28 +22,24 @@ type Visit interface {
 	Cache(State, Digest)
 }
 
-func Traverse(t *Tree, cur, dst Pos, v Visit) {
-	var s State
+func Traverse(t *Tree, s State, v Visit) {
 	var d Digest
 	var ok bool
 
-	s.cur = cur
-	s.dst = dst
+	// defer func() { fmt.Println("Visit -> ", s.cur) }()
 
-	if d, ok = t.Cached(cur, dst); ok {
+	if d, ok = t.Cached(s); ok {
 		v.Cache(s, d)
 		return
 	}
 
-	switch cur.Dir(dst) {
-	case Next:
-		Traverse(t, cur.Left(), dst, v)
-		Traverse(t, cur.Right(), dst, v)
-		d = v.Exec(s)
-	case Halt:
-		d = v.Exec(s)
+	if s.Next() {
+		Traverse(t, s.Left(), v)
+		Traverse(t, s.Right(), v)
 	}
 
-	t.Cache(cur, dst, d)
+	d = v.Exec(s)
+
+	t.Cache(s, d)
 
 }

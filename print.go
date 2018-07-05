@@ -2,31 +2,39 @@ package main
 
 import "fmt"
 
-type Print struct {
+type PrintVisitor struct {
+	m    Path
+	next Action
+	halt Action
 }
 
-func (c *Print) Exec(s State) Digest {
-	fmt.Println(s.cur)
-	return nil
-}
-
-func (c *Print) Cache(s State, d Digest) {
-	fmt.Println(s.cur)
-}
-
-func PrintTree(p Path, s, h uint64) {
-	var i, l uint64
-	cs := s
-
-	fmt.Printf("Tree size: %d height: %d\n", s, h)
-	cs = s - 1
-	for i = 0; i <= h; i++ {
-		fmt.Printf("%[2]*.[1]s", "", i)
-		for l = 0; l <= cs; l++ {
-			k := Pos{i, l}
-			fmt.Printf(" %d ", p[k])
-		}
-		fmt.Printf("\n")
-		cs = cs / 2
+func (p *PrintVisitor) Exec(s State) Digest {
+	if s.Next() {
+		return p.next(s)
 	}
+	return p.halt(s)
+}
+
+func (p *PrintVisitor) Cache(s State, d Digest) {
+	fmt.Printf("cached")
+}
+
+func NewPrintVisitor(m Path) *PrintVisitor {
+	var p PrintVisitor
+	p.m = m
+	p.halt = func(s State) Digest {
+		fmt.Printf("%d", s.cur)
+		return nil
+	}
+
+	p.next = func(s State) Digest {
+		fmt.Printf("%d", s.cur.Left())
+		fmt.Printf("%d", s.cur.Right())
+		if s.cur.i >= pow(2, s.cur.l)-1 {
+			fmt.Printf("\n")
+		}
+		return nil
+	}
+
+	return &p
 }

@@ -16,7 +16,7 @@ func main() {
 	for i := 0; i < 300; i++ {
 		d, v = t.Add(event)
 	}
-	c := v.(*ComputeHash)
+	c := v.(*ComputeVisitor)
 
 	fmt.Println(d, len(c.path))
 
