@@ -29,11 +29,7 @@ func Traverse(t *Tree, s State, v Visit) {
 	// defer func() { fmt.Println("Visit -> ", s.cur) }()
 
 	if d, ok = t.Cached(s); ok {
-<<<<<<< HEAD
-		v.Cache(s, d)
-=======
 		v.VisitCached(s, d)
->>>>>>> simplify visit interface, printer will not work probably
 		return
 	}
 
@@ -43,11 +39,6 @@ func Traverse(t *Tree, s State, v Visit) {
 	}
 	d = v.Visit(s)
 
-<<<<<<< HEAD
-	d = v.Exec(s)
-
-=======
->>>>>>> simplify visit interface, printer will not work probably
 	t.Cache(s, d)
 
 }
