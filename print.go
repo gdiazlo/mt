@@ -23,14 +23,14 @@ func NewPrintVisitor(m Path) *PrintVisitor {
 	var p PrintVisitor
 	p.m = m
 	p.halt = func(s State) Digest {
-		fmt.Printf("%d", s.cur)
+		fmt.Printf("%d", s.p)
 		return nil
 	}
 
 	p.next = func(s State) Digest {
-		fmt.Printf("%d", s.cur.Left())
-		fmt.Printf("%d", s.cur.Right())
-		if s.cur.i >= pow(2, s.cur.l)-1 {
+		fmt.Printf("%d", s.p.Left())
+		fmt.Printf("%d", s.p.Right())
+		if s.p.i >= pow(2, s.p.l)-1 {
 			fmt.Printf("\n")
 		}
 		return nil

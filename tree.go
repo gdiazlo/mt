@@ -24,20 +24,31 @@ func (t *Tree) Add(event []byte) (Digest, Visit) {
 	defer t.Unlock()
 	c := NewComputeVisitor(event)
 	t.size++
+	Traverse(t, State{t.Root(), t.size - 1}, c)
 
-	Traverse(t, State{t.Root(), t.Last(), t.size}, c)
+	return c.path[t.Root()], c
+}
+
+func (t *Tree) Incremental(j, k Pos) (Digest, Visit) {
+	t.Lock()
+	defer t.Unlock()
+	c := NewComputeVisitor(nil)
+	t.size++
+	Traverse(t, State{t.Root(), j, j.i}, c)
+	Traverse(t, State{t.Root(), k, k.i}, c)
 
 	return c.path[t.Root()], c
 }
 
 func (t Tree) Cached(s State) (d Digest, ok bool) {
-	// if s.dst.i >= s.cur.i+pow(2, s.cur.l)-1 {
-	d, ok = t.cache[s.cur]
-	// }
+	if s.v >= s.p.i+pow(2, s.p.l)-1 {
+		d, ok = t.cache[s.p]
+	}
 	return
 }
 
 func (t *Tree) Cache(s State, d Digest) {
-	// if s.dst.i >= s.cur.i+pow(2, s.cur.l)-1 {
-	t.cache[s.cur] = d
+	if s.v >= s.p.i+pow(2, s.p.l)-1 {
+		t.cache[s.p] = d
+	}
 }

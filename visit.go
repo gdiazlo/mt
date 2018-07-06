@@ -1,20 +1,23 @@
 package main
 
 type State struct {
-	cur, dst Pos
-	n        uint64
+	p Pos
+	v uint64
 }
 
 func (s State) Left() State {
-	return State{s.cur.Left(), s.dst, s.n}
+	return State{s.p.Left(), s.v}
 }
 
 func (s State) Right() State {
-	return State{s.cur.Right(), s.dst, s.n}
+	return State{s.p.Right(), s.v}
 }
 
 func (s State) Next() bool {
-	return s.cur.Next(s.dst) && s.n >= 1
+	if s.v < s.p.i {
+		return false
+	}
+	return s.p.Next()
 }
 
 type Visit interface {
@@ -32,7 +35,6 @@ func Traverse(t *Tree, s State, v Visit) {
 		v.VisitCached(s, d)
 		return
 	}
-
 	if s.Next() {
 		Traverse(t, s.Left(), v)
 		Traverse(t, s.Right(), v)

@@ -15,7 +15,7 @@ type Pos struct {
 	i, l uint64 // index, layer
 }
 
-func (p Pos) Next(dst Pos) bool {
+func (p Pos) Next() bool {
 	return p.l != 0
 }
 
