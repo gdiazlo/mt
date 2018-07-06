@@ -37,7 +37,9 @@ func TestAdd(t *testing.T) {
 	for i, c := range testCases {
 		rh, v := tree.Add(c.eventDigest)
 		ch := v.(*ComputeVisitor)
-		fmt.Println(tree.Root(), len(ch.path), ch.path)
+		fmt.Println("path: ", len(ch.path))
+		fmt.Println("---")
+		fmt.Println(ch.path)
 		assert.Equalf(t, c.expectedRootHash, rh, "Incorrect root hash for index %d", i)
 	}
 }
@@ -54,5 +56,7 @@ func TestIncremental(t *testing.T) {
 
 	d, v := tree.Incremental(j, k)
 	ch := v.(*ComputeVisitor)
-	fmt.Println(d, len(ch.path), ch.path)
+	fmt.Println(d, len(ch.path))
+	fmt.Println("---")
+	fmt.Println(ch.path)
 }

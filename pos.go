@@ -4,13 +4,6 @@ import (
 	"math"
 )
 
-type Dir int
-
-const (
-	Next Dir = iota
-	Halt
-)
-
 type Pos struct {
 	i, l uint64 // index, layer
 }
