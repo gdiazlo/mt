@@ -8,6 +8,29 @@ import (
 	assert "github.com/stretchr/testify/require"
 )
 
+type Case struct {
+	in  Digest
+	out Digest
+}
+
+var testCases []Case
+
+func init() {
+	testCases = []Case{
+		{[]byte{0x0}, []byte{0x0}},
+		{[]byte{0x1}, []byte{0x1}},
+		{[]byte{0x2}, []byte{0x3}},
+		{[]byte{0x3}, []byte{0x0}},
+		{[]byte{0x4}, []byte{0x4}},
+		{[]byte{0x5}, []byte{0x1}},
+		{[]byte{0x6}, []byte{0x7}},
+		{[]byte{0x7}, []byte{0x0}},
+		{[]byte{0x8}, []byte{0x8}},
+		{[]byte{0x9}, []byte{0x1}},
+	}
+
+}
+
 func newTree() *Tree {
 	var m sync.RWMutex
 	t := Tree{make(Path), 0, m}
@@ -16,47 +39,38 @@ func newTree() *Tree {
 
 func TestAdd(t *testing.T) {
 
-	testCases := []struct {
-		eventDigest      Digest
-		expectedRootHash Digest
-	}{
-		{[]byte{0x0}, []byte{0x0}},
-		{[]byte{0x1}, []byte{0x1}},
-		{[]byte{0x2}, []byte{0x1}},
-		{[]byte{0x3}, []byte{0x0}},
-		{[]byte{0x4}, []byte{0x4}},
-		{[]byte{0x5}, []byte{0x4}},
-		{[]byte{0x6}, []byte{0x1}},
-		{[]byte{0x7}, []byte{0x0}},
-		{[]byte{0x8}, []byte{0x0}},
-		{[]byte{0x9}, []byte{0x1}},
-	}
-
 	tree := newTree()
 
 	for i, c := range testCases {
-		rh, v := tree.Add(c.eventDigest)
-		ch := v.(*ComputeVisitor)
-		fmt.Println("path: ", len(ch.path))
-		fmt.Println("---")
-		fmt.Println(ch.path)
-		assert.Equalf(t, c.expectedRootHash, rh, "Incorrect root hash for index %d", i)
+		rh, _ := tree.Add(c.in)
+		assert.Equalf(t, c.out, rh, "Incorrect root hash for index %d", i)
 	}
 }
 
 func TestIncremental(t *testing.T) {
 	tree := newTree()
+	d := make([]Digest, len(testCases))
 
-	for i := 0; i < 13; i++ {
-		tree.Add([]byte{0x0})
+	for i, c := range testCases {
+		d[i], _ = tree.Add(c.in)
+		assert.Equalf(t, c.out, d[i], "Incorrect root hash for index %d", i)
 	}
 
 	j := Pos{4, 0}
-	k := Pos{12, 0}
+	k := Pos{9, 0}
 
-	d, v := tree.Incremental(j, k)
+	di, v := tree.Incremental(j, k)
 	ch := v.(*ComputeVisitor)
-	fmt.Println(d, len(ch.path))
+
 	fmt.Println("---")
 	fmt.Println(ch.path)
+
+	jv := NewComputeVisitor([]byte{0x0})
+	kv := NewComputeVisitor([]byte{0x0})
+
+	Traverse(tree, State{j, 4}, jv)
+	Traverse(tree, State{j, 9}, kv)
+
+	fmt.Println(di, " ", d[4], " == ", jv, d[9], " == ", kv)
+
 }
