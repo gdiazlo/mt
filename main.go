@@ -8,7 +8,7 @@ import (
 func main() {
 	var m sync.RWMutex
 	var d Digest
-	var v Visit
+	var v Visitor
 	event := []byte("test event 0")
 
 	t := &Tree{make(Path), 0, m}

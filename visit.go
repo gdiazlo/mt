@@ -20,12 +20,12 @@ func (s State) Next() bool {
 	return s.p.Next()
 }
 
-type Visit interface {
+type Visitor interface {
 	Visit(State) Digest
 	VisitCached(State, Digest)
 }
 
-func Traverse(t *Tree, s State, v Visit) {
+func Traverse(t *Tree, s State, v Visitor) {
 	var d Digest
 	var ok bool
 

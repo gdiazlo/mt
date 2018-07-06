@@ -19,7 +19,7 @@ func (t Tree) Last() Pos {
 	return Pos{t.size, 0}
 }
 
-func (t *Tree) Add(event []byte) (Digest, Visit) {
+func (t *Tree) Add(event []byte) (Digest, Visitor) {
 	t.Lock()
 	defer t.Unlock()
 	c := NewComputeVisitor(event)
@@ -29,7 +29,7 @@ func (t *Tree) Add(event []byte) (Digest, Visit) {
 	return c.path[t.Root()], c
 }
 
-func (t *Tree) Incremental(j, k Pos) (Digest, Visit) {
+func (t *Tree) Incremental(j, k Pos) (Digest, Visitor) {
 	t.Lock()
 	defer t.Unlock()
 	c := NewComputeVisitor(nil)

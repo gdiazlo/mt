@@ -65,8 +65,12 @@ func TestIncremental(t *testing.T) {
 	fmt.Println("---")
 	fmt.Println(ch.path)
 
-	jv := NewComputeVisitor([]byte{0x0})
-	kv := NewComputeVisitor([]byte{0x0})
+	e := testCases[j.i].in
+	cv := NewComputeVisitor(e)
+	pv := NewPrintVisitor()
+
+	jv := NewMetaVisitor(cv, pv)
+	kv := NewMetaVisitor(cv, pv)
 
 	Traverse(tree, State{j, 4}, jv)
 	Traverse(tree, State{j, 9}, kv)
