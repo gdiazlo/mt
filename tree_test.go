@@ -45,7 +45,7 @@ func TestAdd(t *testing.T) {
 func TestIncremental(t *testing.T) {
 	tree := newTree()
 
-	for i := 0; i < 16; i++ {
+	for i := 0; i < 13; i++ {
 		tree.Add([]byte{0x0})
 	}
 

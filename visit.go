@@ -29,8 +29,6 @@ func Traverse(t *Tree, s State, v Visit) {
 	var d Digest
 	var ok bool
 
-	// defer func() { fmt.Println("Visit -> ", s.cur) }()
-
 	if d, ok = t.Cached(s); ok {
 		v.VisitCached(s, d)
 		return

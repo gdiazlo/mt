@@ -34,8 +34,8 @@ func (t *Tree) Incremental(j, k Pos) (Digest, Visit) {
 	defer t.Unlock()
 	c := NewComputeVisitor(nil)
 	t.size++
-	Traverse(t, State{t.Root(), j, j.i}, c)
-	Traverse(t, State{t.Root(), k, k.i}, c)
+	Traverse(t, State{t.Root(), j.i}, c)
+	Traverse(t, State{t.Root(), k.i}, c)
 
 	return c.path[t.Root()], c
 }
