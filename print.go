@@ -3,8 +3,6 @@ package main
 import "fmt"
 
 type PrintVisitor struct {
-	next Action
-	halt Action
 }
 
 func (p *PrintVisitor) Visit(s State) Digest {

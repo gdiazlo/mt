@@ -8,6 +8,7 @@ import (
 type Tree struct {
 	cache Path
 	size  uint64
+	h     Hasher
 	sync.RWMutex
 }
 
@@ -22,7 +23,7 @@ func (t Tree) Last() Pos {
 func (t *Tree) Add(event []byte) (Digest, Visitor) {
 	t.Lock()
 	defer t.Unlock()
-	c := NewComputeVisitor(event)
+	c := NewComputeVisitor(t.h, event)
 	t.size++
 	Traverse(t, State{t.Root(), t.size - 1}, c)
 
@@ -32,7 +33,7 @@ func (t *Tree) Add(event []byte) (Digest, Visitor) {
 func (t *Tree) Incremental(j, k Pos) (Digest, Visitor) {
 	t.Lock()
 	defer t.Unlock()
-	c := NewComputeVisitor(nil)
+	c := NewComputeVisitor(t.h, nil)
 	t.size++
 	Traverse(t, State{t.Root(), j.i}, c)
 	Traverse(t, State{t.Root(), k.i}, c)

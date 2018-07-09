@@ -20,6 +20,10 @@ func (p Pos) Right() Pos {
 	return Pos{p.i + pow(2, p.l-1), p.l - 1}
 }
 
+func (p Pos) Equal(a Pos) bool {
+	return p.i == a.i && p.l == a.l
+}
+
 func pow(x, y uint64) uint64 {
 	return uint64(math.Pow(float64(x), float64(y)))
 }

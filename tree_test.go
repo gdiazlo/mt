@@ -14,6 +14,7 @@ type Case struct {
 }
 
 var testCases []Case
+var hashers []Hasher
 
 func init() {
 	testCases = []Case{
@@ -29,17 +30,29 @@ func init() {
 		{[]byte{0x9}, []byte{0x1}},
 	}
 
-}
+	hashers = []Hasher{
+		xorhasher,
+		pearsonhasher,
+		sha256hasher,
+	}
 
-func newTree() *Tree {
+}
+func duppath(p Path) Path {
+	np := make(Path)
+	for k, v := range p {
+		np[k] = v
+	}
+	return np
+}
+func newTree(h Hasher) *Tree {
 	var m sync.RWMutex
-	t := Tree{make(Path), 0, m}
+	t := Tree{make(Path), 0, h, m}
 	return &t
 }
 
-func TestAdd(t *testing.T) {
+func TestAddXor(t *testing.T) {
 
-	tree := newTree()
+	tree := newTree(xorhasher)
 
 	for i, c := range testCases {
 		rh, _ := tree.Add(c.in)
@@ -47,8 +60,30 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestAddAndVerify(t *testing.T) {
+
+	for i, h := range hashers {
+		tr := newTree(h)
+
+		event := h([]byte("a test event"))
+
+		_, v := tr.Add(event)
+		ch := *v.(*ComputeVisitor)
+
+		nt := newTree(h)
+		nt.cache = duppath(ch.path)
+		nt.size = 1
+
+		nc := NewComputeVisitor(h, event)
+		Traverse(nt, State{nt.Root(), nt.size - 1}, nc)
+
+		assert.Equal(t, nc.path[nt.Root()], ch.path[tr.Root()], "root digests !equal when using hasher %d", i)
+	}
+
+}
+
 func TestIncremental(t *testing.T) {
-	tree := newTree()
+	tree := newTree(xorhasher)
 	d := make([]Digest, len(testCases))
 
 	for i, c := range testCases {
@@ -57,24 +92,28 @@ func TestIncremental(t *testing.T) {
 	}
 
 	j := Pos{4, 0}
+	rj := Pos{0, 3}
 	k := Pos{9, 0}
+	rk := Pos{0, 4}
 
 	di, v := tree.Incremental(j, k)
 	ch := v.(*ComputeVisitor)
 
 	fmt.Println("---")
-	fmt.Println(ch.path)
+	fmt.Println(len(ch.path), ch.path)
 
 	e := testCases[j.i].in
-	cv := NewComputeVisitor(e)
-	pv := NewPrintVisitor()
+	cv := NewComputeVisitor(xorhasher, e)
 
-	jv := NewMetaVisitor(cv, pv)
-	kv := NewMetaVisitor(cv, pv)
-
-	Traverse(tree, State{j, 4}, jv)
-	Traverse(tree, State{j, 9}, kv)
-
-	fmt.Println(di, " ", d[4], " == ", jv, d[9], " == ", kv)
+	/*
+		pv := NewPrintVisitor()
+		jv := NewMetaVisitor(cv, pv)
+		kv := NewMetaVisitor(cv, pv)
+	*/
+	fmt.Println("digest ", di)
+	Traverse(tree, State{rj, 4}, cv)
+	fmt.Println("From ", rj, " -->  ", cv.path)
+	Traverse(tree, State{rk, 9}, cv)
+	fmt.Println("From ", rk, " -->  ", cv.path)
 
 }

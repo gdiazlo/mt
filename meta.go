@@ -24,7 +24,6 @@ func (m MetaVisitor) VisitCached(s State, d Digest) {
 func NewMetaVisitor(vs ...Visitor) Visitor {
 	var m MetaVisitor
 	m.vs = make([]Visitor, len(vs))
-	m.vs = append(m.vs, vs...)
-
+	m.vs = vs
 	return &m
 }

@@ -31,14 +31,16 @@ func Traverse(t *Tree, s State, v Visitor) {
 
 	if d, ok = t.Cached(s); ok {
 		v.VisitCached(s, d)
-		return
+		// return
 	}
 	if s.Next() {
 		Traverse(t, s.Left(), v)
 		Traverse(t, s.Right(), v)
 	}
-	d = v.Visit(s)
 
-	t.Cache(s, d)
+	if d == nil {
+		d = v.Visit(s)
+		t.Cache(s, d)
+	}
 
 }
